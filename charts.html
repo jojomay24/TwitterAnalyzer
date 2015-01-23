@@ -1,0 +1,139 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+<TITLE>Twitter Charts</TITLE>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+</HEAD>
+<BODY>
+    <div style="border: 2px solid; border-radius: 25px;padding: 1.5em; margin: 1em; border-color: gray;">
+        <div>
+            <label for="twitterUser">@</label>
+            <input id="twitterUser" placeholder="... eg alexjojomay"/>
+            <button id="analyzeBtn">analyze</button>
+        </div>
+        <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </div>
+    
+
+    <script>
+    $(function () {
+    	$('#analyzeBtn').click(function() {
+    		var twitterUser = $('#twitterUser').val();
+    		if (!twitterUser) {
+    			alert("Bitte einen TwitterUser angeben");	
+    		} else {
+    			analyze(twitterUser);
+    		}
+    		
+    	});
+    	
+    	function getOptions() {
+			return {
+		        chart: {
+		            type: 'spline',
+		         renderTo: 'container',
+		        },
+		        title: {
+		            text: 'follower stats'
+		        },
+		        subtitle: {
+		            text: '... over time ...'
+		        },
+		        xAxis: {
+		            type: 'datetime',
+		            title: {
+		                text: 'Date'
+		            }
+		        },
+		        yAxis: {
+		            title: {
+		                text: 'nr followers'
+		            },
+		            min: 0
+		        },
+		        tooltip: {
+		        	useHTML: true,
+		            formatter: function() {
+		            	var headline = '<b>'+ new Date(this.point.x).toDateString() + ': ' + this.point.y + ' follower </b> <br><br>';
+		            	
+		            	if (!this.point.twitterUserImageUrl) {
+		            		return headline;
+		            	} else {
+		                return headline + 
+		                	 this.point.changeType + ": " + this.point.twitterUserName + ' (' + this.point.twitterUserScreenName + ')' +
+		                	 '<br><img src="' + this.point.twitterUserImageUrl + '" style="max-width: 60px; height: auto;" />';
+		            	}
+		            	
+		            }
+// 		            headerFormat: '<b>{series.name}</b><br>',
+// 		            pointFormat: '{point.twitterUser} <br>{point.x:%e. %b}: {point.y:f} follower'
+// 		            	https://api.twitter.com/1.1/users/lookup.json
+		        },
+
+		        plotOptions: {
+		            spline: {
+		                marker: {
+		                    enabled: true
+		                }
+		            }
+		        },
+		        series: []
+			};
+    	}
+		
+		function analyze(twitterUser) {
+			drawFollowerChart(twitterUser);
+		}
+		
+		
+		function drawFollowerChart(twitterUser) {
+            $.ajax({
+            	cache: false,
+                url: "./." + twitterUser + "-followerIDs.delta",
+                    type : 'GET',
+                    dataType : 'text',
+                    async: false,
+                success: function(data) {
+                      var lines = data.split('\n');
+                      var mydata = [];
+                      var cntLast = 0;
+                      $.each(lines, function(lineNo, line) {
+                          var items = line.split(';');
+                          if (typeof items[1] != 'undefined') {
+                          cntLast = parseFloat(items[3]);
+                          var entry = { 
+                        		  x: parseFloat(items[1]),
+                        		  y: cntLast,
+                        		  twitterUserImageUrl: items[4],
+                        		  twitterUserScreenName : items[5],
+                        		  twitterUserName : items[6],
+                        		  changeType : items[0]};
+                          mydata.push(entry);
+                          }
+                      });
+                      
+                   mydata.push([Date.now(),cntLast]);
+                      
+          			var myseries = {
+                        data: mydata,
+                        name : "@" + twitterUser + " follower"
+                    };
+          			var opts = getOptions();
+      				opts.series.push(myseries);
+                    var chart = new Highcharts.Chart(opts);
+                },
+                error(a,b,c) {
+                	alert("Ein Fehler ist aufgetreten (Evtl. gibts kein Datensatz?)");
+                }
+          });
+		}
+
+    });
+	</script>
+
+</BODY>
+</HTML>
+
+

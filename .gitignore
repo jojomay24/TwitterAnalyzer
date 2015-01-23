@@ -1,1 +1,9 @@
 /build
+.classpath
+.gradle
+.gradle
+.project
+.settings/
+.springBeans
+bin
+gradle
