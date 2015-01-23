@@ -1,10 +1,11 @@
 # TwitterAnalyzer
-Keeps track of your twitter followers and visualizes as a nice chart.
+Keeps track of your twitter followers and visualizes as a nice chart. 
+See demo here: http://alexxx.eltanin.uberspace.de/twitter/charts.html  and enter alexjojomay 
 
-## Technology
- java (spring boot), html, highcharts.js
+### Technology
+ java 7 (spring boot,twitter4j), html, highcharts.js
 
-## Instructions:
+### Instructions:
 ... clone it!
 
 ... build it:
