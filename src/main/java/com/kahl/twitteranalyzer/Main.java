@@ -53,7 +53,6 @@ public class Main {
 		createFileIfNotExisting(filenameFollowerIDsDelta());
 		createFileIfNotExisting(filenameFollowerIDsCurrent());
 		
-		// putting all known ids in a set
 		Set<String> currentIDsFromFile = readAllIDsFromCurrentFile(); 
 		currentIDsFromTwitter = getAllFollwerIDsFromTwitter();
 		

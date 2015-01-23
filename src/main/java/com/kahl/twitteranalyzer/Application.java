@@ -1,4 +1,3 @@
-
 package com.kahl.twitteranalyzer;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -25,19 +24,33 @@ import com.kahl.twitteranalyzer.Application.TwitterConfig;
 @EnableAutoConfiguration
 public class Application {
 	
-	/* --twitterUser="tngtech" --fileOutputBasePath="/tmp/"
-	 */
-	
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
 		String twitterUser = context.getEnvironment().getProperty("twitterUser");
-		String basePath = context.getEnvironment().getProperty("fileOutputBasePath");
-		if (Strings.isNullOrEmpty(twitterUser) || Strings.isNullOrEmpty(basePath)) {
+		
+		String consumerKey = context.getEnvironment().getProperty("OAuthConsumerKey");
+		String consumerSecret = context.getEnvironment().getProperty("OAuthConsumerSecret");
+		String accessToken = context.getEnvironment().getProperty("OAuthAccessToken");
+		String accessTokenSecret = context.getEnvironment().getProperty("OAuthAccessTokenSecret");
+		
+		
+		if (Strings.isNullOrEmpty(twitterUser)) {
 			System.out.println("########################################################\n" +
 					           "#  Missing Params:  \n" +
 					           "#  --twitterUser=\"xxx\" \n" +
 					           "#  --fileOutputBasePath=\"/tmp/\" \n" +
 					           "########################################################");
+		} else if (Strings.isNullOrEmpty(consumerKey) || Strings.isNullOrEmpty(consumerSecret)
+				|| Strings.isNullOrEmpty(accessToken) || Strings.isNullOrEmpty(accessTokenSecret)){
+			System.out.println("########################################################\n" +
+			           "#  Missing TwitterAuthData: \n" + 
+					   "#  Create a file application.properties either in src/main/resources (if you build the source yourself) or in the same folder where the jar file is located (if you only run the built jar file via java -jar ... ) \n" +
+					   "#  Include following properties: \n" +
+					   "#     OAuthConsumerKey=YOUR_DATA \n" + 
+					   "#     OAuthConsumerSecret=YOUR_DATA \n" + 
+					   "#     OAuthAccessToken=YOUR_DATA \n" + 
+					   "#     OAuthAccessTokenSecret=YOUR_DATA \n" +  
+			           "########################################################");
 		} else {
 			Main main = context.getBean(Main.class);
 			main.analyze();
@@ -49,10 +62,10 @@ public class Application {
 	@Configuration
 	protected static class TwitterConfig {
 		
-		@Value("${OAuthConsumerKey}")	private String consumerKey;
-		@Value("${OAuthConsumerSecret}") private String consumerSecret;
-		@Value("${OAuthAccessToken}") private String accessToken;
-		@Value("${OAuthAccessTokenSecret}") private String accessTokenSecret;
+		@Value("${OAuthConsumerKey:}")	private String consumerKey;
+		@Value("${OAuthConsumerSecret:}") private String consumerSecret;
+		@Value("${OAuthAccessToken:}") private String accessToken;
+		@Value("${OAuthAccessTokenSecret:}") private String accessTokenSecret;
 		
 		@Bean
 		public TwitterFactory twitterFactory() {

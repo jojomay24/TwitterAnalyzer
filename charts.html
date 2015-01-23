@@ -10,7 +10,7 @@
     <div style="border: 2px solid; border-radius: 25px;padding: 1.5em; margin: 1em; border-color: gray;">
         <div>
             <label for="twitterUser">@</label>
-            <input id="twitterUser" placeholder="... eg alexjojomay"/>
+            <input id="twitterUser" placeholder="... eg tngtech"/>
             <button id="analyzeBtn">analyze</button>
         </div>
         <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
@@ -56,20 +56,18 @@
 		        tooltip: {
 		        	useHTML: true,
 		            formatter: function() {
-		            	var headline = '<b>'+ new Date(this.point.x).toDateString() + ': ' + this.point.y + ' follower </b> <br><br>';
+		            	var headline = '<b>'+ new Date(this.point.x).toDateString() + ': ' + this.point.y + ' follower </b> ';
 		            	
 		            	if (!this.point.twitterUserImageUrl) {
 		            		return headline;
 		            	} else {
-		                return headline + 
-		                	 this.point.changeType + ": " + this.point.twitterUserName + ' (' + this.point.twitterUserScreenName + ')' +
-		                	 '<br><img src="' + this.point.twitterUserImageUrl + '" style="max-width: 60px; height: auto;" />';
+                            var bottomline = this.point.changeType + ": " + this.point.twitterUserName + ' (' + this.point.twitterUserScreenName + ')';
+                            var myTooltip = '<img src="' + this.point.twitterUserImageUrl + '" style="max-height: 60px; width: auto;float:left;" />' +
+                                            '<div style="width: 210px;margin-left: 5em;">' + headline + '<br>' + bottomline + '</div>';
+                            return myTooltip;
 		            	}
 		            	
 		            }
-// 		            headerFormat: '<b>{series.name}</b><br>',
-// 		            pointFormat: '{point.twitterUser} <br>{point.x:%e. %b}: {point.y:f} follower'
-// 		            	https://api.twitter.com/1.1/users/lookup.json
 		        },
 
 		        plotOptions: {
@@ -94,7 +92,7 @@
                 url: "./." + twitterUser + "-followerIDs.delta",
                     type : 'GET',
                     dataType : 'text',
-                    async: false,
+                    async:true,
                 success: function(data) {
                       var lines = data.split('\n');
                       var mydata = [];
@@ -124,7 +122,7 @@
       				opts.series.push(myseries);
                     var chart = new Highcharts.Chart(opts);
                 },
-                error(a,b,c) {
+                error: function(a,b,c) {
                 	alert("Ein Fehler ist aufgetreten (Evtl. gibts kein Datensatz?)");
                 }
           });
@@ -135,5 +133,3 @@
 
 </BODY>
 </HTML>
-
-
